@@ -1,7 +1,9 @@
+//	
+//	ofxThreadedLogger
 //
-//  telephoneRewired.h
+//  LoggerThread.cpp
 //
-//  Created by Sean Montgomery on 12/18/12.
+//  Created by Sean Montgomery on 2016-05-29
 //  http://produceconsumerobot.com/
 //
 //  This work is licensed under the Creative Commons 
@@ -9,95 +11,57 @@
 //  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
 //
 
-#include "ofxThreadedlogger.h"
 
-// ------------------------------------------------------- 
-// LoggerThread()
-// -------------------------------------------------------
-LoggerThread::LoggerThread(string logDirPath, string fileName) {
-	setDirPath(logDirPath);
-	setFileName(fileName);
-}
-	
-LoggerThread::~LoggerThread() {
-	// Stop the thread if it's still running
-	//if (isThreadRunning()) {
-		//stopThread();
-	//	waitForThread(true); // Stops thread and waits for thread to be cleaned up
-	//}
+/*
+ * LoggerThread.cpp
+ *
+ *  Created on: 2016-05-29
+ *      Author: ProduceConsumeRobot
+ */
 
-	popAll();
-}
+#include "ofxThreadedLogger.h"
+#include "ofConstants.h"
 
-void LoggerThread::setDirPath(string logDirPath) {
-	_logDirPath = logDirPath;
+LoggerThread::LoggerThread()
+: logFilePath(ofToDataPath("") + "log.txt"){
+	// start the thread as soon as the
+	// class is created, it won't use any CPU
+	// until we send a new frame to be analyzed
+	startThread();
 }
 
-void LoggerThread::setFileName(string fileName) {
-	_fileName = fileName;
+LoggerThread::~LoggerThread(){
+	// when the class is destroyed
+	// close both channels and wait for
+	// the thread to finish
+	toLog.close();
+	waitForThread(true);
 }
 
-
-string LoggerThread::fileDateTimeString(unsigned long long ofTime)
-{
-    string output = "";
-    
-    int year = ofGetYear();
-    int month = ofGetMonth();
-    int day = ofGetDay();
-    int hours = ofGetHours();
-    int minutes = ofGetMinutes();
-    int seconds = ofGetSeconds();
-    
-    output = output + ofToString(year) + ".";
-    if (month < 10) output = output + "0";
-    output = output + ofToString(month) + ".";
-    if (day < 10) output = output + "0";
-    output = output + ofToString(day) + ", ";
-    if (hours < 10) output = output + "0";
-    output = output + ofToString(hours) + ".";
-    if (minutes < 10) output = output + "0";
-    output = output + ofToString(minutes) + ".";
-    if (seconds < 10) output = output + "0";
-    output = output + ofToString(seconds) + ", ";
-    output = output + ofToString(ofTime - (ofTime / 1000));
-    
-    return output;
-}
-
-void LoggerThread::log(string data) {
-	ofDirectory dir(_logDirPath);
-	dir.create(true);
-	//_mkdir( _logDirPath.c_str() );//, S_IRWXU | S_IRWXG | S_IRWXO);
-
-    string fileName = _logDirPath + _fileName;
-    
-    ofstream mFile;
-	mFile.open(fileName.c_str(), ios::out | ios::app);
-  	mFile << data;
-	
-    mFile.close();
-}
-
-void LoggerThread::pop() {
-	if (!loggerQueue.empty()) {
-		log(loggerQueue.front());
-		loggerQueue.pop();
-	}
-}
-
-void LoggerThread::popAll() {
-	while (!loggerQueue.empty()) {
-		pop();
-	}
+void LoggerThread::log(string logString){
+	// send the line to the thread for logging
+	// this makes a copy 
+	toLog.send(logString);
 }
 
 void LoggerThread::threadedFunction() {
-	while (isThreadRunning()) {
-		lock();
-		popAll();
-		unlock();
-
-		sleep(10);
+	// wait until there's a new frame
+	// this blocks the thread, so it doesn't use
+	// the CPU at all, until a frame arrives.
+	// also receive doesn't allocate or make any copies
+	string logString;
+	while (toLog.receive(logString)) {
+		// Write the string to the log
+		ofstream mFile;
+		mFile.open(logFilePath, ios::out | ios::app);
+		mFile << logString;
+		mFile.close();
 	}
 }
+
+int LoggerThread::setPath(string filePath) {
+	// ToDo:: Add error checking
+	logFilePath = filePath;
+	return 0;
+}
+

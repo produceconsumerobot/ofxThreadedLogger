@@ -1,7 +1,9 @@
+//	
+//	ofxThreadedLogger
 //
-//  telephoneRewired.h
+//  LoggerThread.h
 //
-//  Created by Sean Montgomery on 12/18/12.
+//  Created by Sean Montgomery on 2016-05-29
 //  http://produceconsumerobot.com/
 //
 //  This work is licensed under the Creative Commons 
@@ -9,35 +11,21 @@
 //  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
 //
 
-#ifndef _OFX_THREADED_LOGGER
-#define _OFX_THREADED_LOGGER
-
-#include <algorithm>
-#include <vector>
-
+#pragma once
 #include "ofMain.h"
 
-
-class LoggerThread : public ofThread {
-private:
-	string _logDirPath;
-	string _fileName;
+class LoggerThread: public ofThread {
 public:
-	static string fileDateTimeString(unsigned long long ofTime);
-
-	LoggerThread(string logDirPath="../LogData/", string fileName=fileDateTimeString(ofGetElapsedTimeMillis()));
+	LoggerThread();
 	~LoggerThread();
-	void setDirPath(string logDirPath);
-	void setFileName(string fileName);
-	void log(string data);
-	void pop();
-	void popAll();
+	void log(string logString);
+	int setPath(string filePath);
+	//bool isLineNew();
 
+private:
 	void threadedFunction();
-
-	queue<string> loggerQueue;
+	ofThreadChannel<string> toLog;
+	string logFilePath;
+	//string logLine;
+	//bool newLine;
 };
-
-#endif
-
-
