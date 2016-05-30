@@ -38,10 +38,10 @@ LoggerThread::~LoggerThread(){
 	waitForThread(true);
 }
 
-void LoggerThread::log(string logString){
+void LoggerThread::log(string & logString){
 	// send the line to the thread for logging
 	// this makes a copy 
-	toLog.send(logString);
+	bool temp = toLog.send(logString);
 }
 
 void LoggerThread::threadedFunction() {
@@ -56,7 +56,9 @@ void LoggerThread::threadedFunction() {
 		mFile.open(logFilePath, ios::out | ios::app);
 		mFile << logString;
 		mFile.close();
+		ofSleepMillis(2);
 	}
+	
 }
 
 int LoggerThread::setPath(string filePath) {
