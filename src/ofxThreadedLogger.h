@@ -18,7 +18,7 @@ class LoggerThread: public ofThread {
 public:
 	LoggerThread();
 	~LoggerThread();
-	void log(string & logString);
+	void log(string logString);
 	int setPath(string filePath);
 	//bool isLineNew();
 

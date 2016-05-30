@@ -38,7 +38,7 @@ LoggerThread::~LoggerThread(){
 	waitForThread(true);
 }
 
-void LoggerThread::log(string & logString){
+void LoggerThread::log(string logString){
 	// send the line to the thread for logging
 	// this makes a copy 
 	bool temp = toLog.send(logString);
