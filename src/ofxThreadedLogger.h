@@ -1,7 +1,9 @@
+//	
+//	ofxThreadedLogger
 //
-//  telephoneRewired.h
+//  LoggerThread.h
 //
-//  Created by Sean Montgomery on 12/18/12.
+//  Created by Sean Montgomery on 2016-05-29
 //  http://produceconsumerobot.com/
 //
 //  This work is licensed under the Creative Commons 
@@ -9,35 +11,45 @@
 //  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
 //
 
-#ifndef _OFX_THREADED_LOGGER
-#define _OFX_THREADED_LOGGER
+#pragma once
 
-#include <algorithm>
-#include <vector>
+//#include <algorithm>
+//#include <vector>
 
 #include "ofMain.h"
 
 
 class LoggerThread : public ofThread {
 private:
-	string _logDirPath;
-	string _fileName;
-public:
-	static string fileDateTimeString(unsigned long long ofTime);
+	//string _logFilePath;		// Path of log file
+	
+	string _logDirPath;			// Path of the directory to put the log file in
+	string _logfileName;		// Name of the log file
+	
+	queue<string> queue1;		// Multiple queues to reduce logging delays
+	queue<string> queue2;		// Multiple queues to reduce logging delays
 
-	LoggerThread(string logDirPath="../LogData/", string fileName=fileDateTimeString(ofGetElapsedTimeMillis()));
-	~LoggerThread();
-	void setDirPath(string logDirPath);
-	void setFileName(string fileName);
-	void log(string data);
+	queue<string> * pushQueue;	// Pointer to queue that's accepting incoming data
+	queue<string> * popQueue;	// Pointer to queue that's being written
+
+	void threadedFunction();	
+	void log(string logString);
 	void pop();
 	void popAll();
+	void swapQueues();
 
-	void threadedFunction();
+public:
+	static string fileDateTimeString(unsigned long long ofTime);	// Deprecated, use ofGetTimestampString()
 
-	queue<string> loggerQueue;
+	LoggerThread();
+	//LoggerThread(string logDirPath="../LogData/", string fileName=fileDateTimeString(ofGetElapsedTimeMillis()));
+	~LoggerThread();
+	//int setPath(string filePath);			// Set the path of the log file
+	void setDirPath(string logDirPath);		// Deprecated, use setPath
+	void setFileName(string fileName);		// Deprecated, use setPath
+	void push(string logString);
 };
 
-#endif
+
 
 

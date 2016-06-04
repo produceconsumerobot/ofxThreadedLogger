@@ -1,7 +1,9 @@
+//	
+//	ofxThreadedLogger
 //
-//  telephoneRewired.h
+//  LoggerThread.cpp
 //
-//  Created by Sean Montgomery on 12/18/12.
+//  Created by Sean Montgomery on 2016-05-29
 //  http://produceconsumerobot.com/
 //
 //  This work is licensed under the Creative Commons 
@@ -9,95 +11,125 @@
 //  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.
 //
 
+
 #include "ofxThreadedlogger.h"
 
 // ------------------------------------------------------- 
 // LoggerThread()
 // -------------------------------------------------------
-LoggerThread::LoggerThread(string logDirPath, string fileName) {
-	setDirPath(logDirPath);
-	setFileName(fileName);
+LoggerThread::LoggerThread() :
+	//: _logFilePath(ofToDataPath("") + "log.txt")
+	_logDirPath(ofToDataPath("")),
+	_logfileName("log.txt")
+{
+	pushQueue = &queue1;
+	popQueue = &queue2;
 }
 	
 LoggerThread::~LoggerThread() {
 	// Stop the thread if it's still running
-	//if (isThreadRunning()) {
-		//stopThread();
-	//	waitForThread(true); // Stops thread and waits for thread to be cleaned up
-	//}
-
+	waitForThread(true);
+	swapQueues();
 	popAll();
 }
 
-void LoggerThread::setDirPath(string logDirPath) {
+void LoggerThread::setDirPath(string logDirPath)
+{
 	_logDirPath = logDirPath;
 }
 
-void LoggerThread::setFileName(string fileName) {
-	_fileName = fileName;
-}
-
-
-string LoggerThread::fileDateTimeString(unsigned long long ofTime)
+void LoggerThread::setFileName(string logfileName)
 {
-    string output = "";
-    
-    int year = ofGetYear();
-    int month = ofGetMonth();
-    int day = ofGetDay();
-    int hours = ofGetHours();
-    int minutes = ofGetMinutes();
-    int seconds = ofGetSeconds();
-    
-    output = output + ofToString(year) + ".";
-    if (month < 10) output = output + "0";
-    output = output + ofToString(month) + ".";
-    if (day < 10) output = output + "0";
-    output = output + ofToString(day) + ", ";
-    if (hours < 10) output = output + "0";
-    output = output + ofToString(hours) + ".";
-    if (minutes < 10) output = output + "0";
-    output = output + ofToString(minutes) + ".";
-    if (seconds < 10) output = output + "0";
-    output = output + ofToString(seconds) + ", ";
-    output = output + ofToString(ofTime - (ofTime / 1000));
-    
-    return output;
+	_logfileName = logfileName;
 }
 
-void LoggerThread::log(string data) {
+
+void LoggerThread::log(string logString) {
+
 	ofDirectory dir(_logDirPath);
 	dir.create(true);
 	//_mkdir( _logDirPath.c_str() );//, S_IRWXU | S_IRWXG | S_IRWXO);
-
-    string fileName = _logDirPath + _fileName;
-    
+    string fileName = _logDirPath + _logfileName;
     ofstream mFile;
 	mFile.open(fileName.c_str(), ios::out | ios::app);
-  	mFile << data;
-	
+	mFile << logString;
     mFile.close();
 }
 
 void LoggerThread::pop() {
-	if (!loggerQueue.empty()) {
-		log(loggerQueue.front());
-		loggerQueue.pop();
+	if (!popQueue->empty()) {
+		log(popQueue->front());
+		popQueue->pop();
 	}
 }
 
-void LoggerThread::popAll() {
-	while (!loggerQueue.empty()) {
+void LoggerThread::popAll() 
+{
+	while (!popQueue->empty()) {
 		pop();
 	}
 }
 
-void LoggerThread::threadedFunction() {
-	while (isThreadRunning()) {
-		lock();
-		popAll();
-		unlock();
+void LoggerThread::push(string logString) 
+{
+	lock();
+	pushQueue->push(logString);
+	unlock();
+}
 
-		sleep(10);
+void LoggerThread::threadedFunction() 
+{
+	while (isThreadRunning()) {
+		// Swap the push queue and the pop queue to permit pushing while
+		// performing slow write operations
+		swapQueues();
+
+		// pop queue is now safe from push thread collisions
+		popAll();
+
+		sleep(4);
 	}
+}
+
+void LoggerThread::swapQueues()
+{
+	lock();
+	if (pushQueue == &queue1)
+	{
+		pushQueue = &queue2;
+		popQueue = &queue1;
+	}
+	else {
+		pushQueue = &queue1;
+		popQueue = &queue2;
+	}
+	unlock();
+}
+
+// Deprecated, use ofGetTimestampString()
+string LoggerThread::fileDateTimeString(unsigned long long ofTime)
+{
+	string output = "";
+
+	int year = ofGetYear();
+	int month = ofGetMonth();
+	int day = ofGetDay();
+	int hours = ofGetHours();
+	int minutes = ofGetMinutes();
+	int seconds = ofGetSeconds();
+
+	output = output + ofToString(year) + ".";
+	if (month < 10) output = output + "0";
+	output = output + ofToString(month) + ".";
+	if (day < 10) output = output + "0";
+	output = output + ofToString(day) + ", ";
+	if (hours < 10) output = output + "0";
+	output = output + ofToString(hours) + ".";
+	if (minutes < 10) output = output + "0";
+	output = output + ofToString(minutes) + ".";
+	if (seconds < 10) output = output + "0";
+	output = output + ofToString(seconds) + ", ";
+	output = output + ofToString(ofTime - (ofTime / 1000));
+
+	return output;
 }
