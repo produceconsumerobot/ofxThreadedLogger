@@ -19,9 +19,12 @@
 // -------------------------------------------------------
 LoggerThread::LoggerThread() :
 	//: _logFilePath(ofToDataPath("") + "log.txt")
-	_logDirPath(ofToDataPath("")),
-	_logfileName("log.txt")
+	_tempLogDirPath(ofToDataPath("")),
+	_tempLogfilename("log.txt")
 {
+	_logDirPath = _tempLogDirPath;
+	_logfilename = _tempLogfilename;
+
 	pushQueue = &queue1;
 	popQueue = &queue2;
 }
@@ -35,12 +38,12 @@ LoggerThread::~LoggerThread() {
 
 void LoggerThread::setDirPath(string logDirPath)
 {
-	_logDirPath = logDirPath;
+	_tempLogDirPath = logDirPath;
 }
 
-void LoggerThread::setFileName(string logfileName)
+void LoggerThread::setFilename(string logfilename)
 {
-	_logfileName = logfileName;
+	_tempLogfilename = logfilename;
 }
 
 
@@ -49,9 +52,9 @@ void LoggerThread::log(string logString) {
 	ofDirectory dir(_logDirPath);
 	dir.create(true);
 	//_mkdir( _logDirPath.c_str() );//, S_IRWXU | S_IRWXG | S_IRWXO);
-    string fileName = _logDirPath + _logfileName;
+    string filename = _logDirPath + _logfilename;
     ofstream mFile;
-	mFile.open(fileName.c_str(), ios::out | ios::app);
+	mFile.open(filename.c_str(), ios::out | ios::app);
 	mFile << logString;
     mFile.close();
 }
@@ -80,9 +83,15 @@ void LoggerThread::push(string logString)
 void LoggerThread::threadedFunction() 
 {
 	while (isThreadRunning()) {
+		lock();
 		// Swap the push queue and the pop queue to permit pushing while
 		// performing slow write operations
 		swapQueues();
+
+		// Update the log file path 
+		_logDirPath = _tempLogDirPath;
+		_logfilename = _tempLogfilename;
+		unlock();
 
 		// pop queue is now safe from push thread collisions
 		popAll();
@@ -93,7 +102,6 @@ void LoggerThread::threadedFunction()
 
 void LoggerThread::swapQueues()
 {
-	lock();
 	if (pushQueue == &queue1)
 	{
 		pushQueue = &queue2;
@@ -103,7 +111,6 @@ void LoggerThread::swapQueues()
 		pushQueue = &queue1;
 		popQueue = &queue2;
 	}
-	unlock();
 }
 
 // Deprecated, use ofGetTimestampString()

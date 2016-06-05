@@ -24,7 +24,9 @@ private:
 	//string _logFilePath;		// Path of log file
 	
 	string _logDirPath;			// Path of the directory to put the log file in
-	string _logfileName;		// Name of the log file
+	string _logfilename;		// Name of the log file
+	string _tempLogDirPath;		// Temporary path to avoid collisions if path changes
+	string _tempLogfilename;	// Temporary name to avoid collisions if filename changes
 	
 	queue<string> queue1;		// Multiple queues to reduce logging delays
 	queue<string> queue2;		// Multiple queues to reduce logging delays
@@ -46,7 +48,7 @@ public:
 	~LoggerThread();
 	//int setPath(string filePath);			// Set the path of the log file
 	void setDirPath(string logDirPath);		// Deprecated, use setPath
-	void setFileName(string fileName);		// Deprecated, use setPath
+	void setFilename(string filename);		// Deprecated, use setPath
 	void push(string logString);
 };
 
