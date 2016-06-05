@@ -15,9 +15,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	//logger.setPath(ofToDataPath("") + "livestream_MaestroLex1_" + ofGetTimestampString("%m") + ".log");
 	logger.setDirPath(ofToDataPath(""));
-	logger.setFileName(ofGetTimestampString("%m") + ".log");
+	logger.setFilename(ofGetTimestampString("%m") + ".log");
 	logger.startThread();
 }
 
@@ -27,7 +26,6 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	//logger.log(ofGetTimestampString("%Y%m%d,%H%M%S,%i,") + "Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy\n");
 	logger.push(ofGetTimestampString("%Y%m%d,%H%M%S,%i,") + "Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy,Happy\n");
 
 }
