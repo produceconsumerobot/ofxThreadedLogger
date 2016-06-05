@@ -12,7 +12,7 @@
 //
 
 
-#include "ofxThreadedlogger.h"
+#include "ofxThreadedLogger.h"
 
 // ------------------------------------------------------- 
 // LoggerThread()
