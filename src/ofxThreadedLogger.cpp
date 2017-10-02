@@ -69,7 +69,13 @@ void LoggerThread::pop() {
 void LoggerThread::popAll() 
 {
 	while (!popQueue->empty()) {
-		pop();
+		string logString = "";
+		while (!popQueue->empty() && (logString.length() + popQueue->front().length() < logString.max_size()))
+		{
+			logString = logString + popQueue->front();
+			popQueue->pop();
+		}
+		log(logString);
 	}
 }
 
