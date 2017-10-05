@@ -50,6 +50,7 @@ public:
 	void setDirPath(string logDirPath);		// Deprecated, use setPath
 	void setFilename(string filename);		// Deprecated, use setPath
 	void push(string logString);
+	void stopThread();
 };
 
 

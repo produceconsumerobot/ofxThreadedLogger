@@ -36,6 +36,13 @@ LoggerThread::~LoggerThread() {
 	popAll();
 }
 
+void LoggerThread::stopThread()
+{
+	waitForThread(true);
+	swapQueues();
+	popAll();
+}
+
 void LoggerThread::setDirPath(string logDirPath)
 {
 	_tempLogDirPath = logDirPath;
