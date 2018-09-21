@@ -45,12 +45,16 @@ void LoggerThread::stopThread()
 
 void LoggerThread::setDirPath(string logDirPath)
 {
+	lock();
 	_tempLogDirPath = logDirPath;
+	unlock();
 }
 
 void LoggerThread::setFilename(string logfilename)
 {
+	lock();
 	_tempLogfilename = logfilename;
+	unlock();
 }
 
 
