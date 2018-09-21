@@ -47,8 +47,8 @@ public:
 	//LoggerThread(string logDirPath="../LogData/", string fileName=fileDateTimeString(ofGetElapsedTimeMillis()));
 	~LoggerThread();
 	//int setPath(string filePath);			// Set the path of the log file
-	void setDirPath(string logDirPath);		// Deprecated, use setPath
-	void setFilename(string filename);		// Deprecated, use setPath
+	void setDirPath(string logDirPath);		
+	void setFilename(string filename);		
 	void push(string logString);
 	void stopThread();
 };
