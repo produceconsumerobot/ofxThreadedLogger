@@ -43,7 +43,8 @@ private:
 public:
 	static string fileDateTimeString(unsigned long long ofTime);	// Deprecated, use ofGetTimestampString()
 
-	LoggerThread();
+	//LoggerThread();
+	LoggerThread(string logDirPath = ofToDataPath(""), string filename = "log.txt");
 	//LoggerThread(string logDirPath="../LogData/", string fileName=fileDateTimeString(ofGetElapsedTimeMillis()));
 	~LoggerThread();
 	//int setPath(string filePath);			// Set the path of the log file

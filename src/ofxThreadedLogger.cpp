@@ -15,15 +15,12 @@
 #include "ofxThreadedLogger.h"
 
 // ------------------------------------------------------- 
-// LoggerThread()
+// LoggerThread(string logDirPath, string logfilename)
 // -------------------------------------------------------
-LoggerThread::LoggerThread() :
-	//: _logFilePath(ofToDataPath("") + "log.txt")
-	_tempLogDirPath(ofToDataPath("")),
-	_tempLogfilename("log.txt")
+LoggerThread::LoggerThread(string logDirPath, string logfilename) 
 {
-	_logDirPath = _tempLogDirPath;
-	_logfilename = _tempLogfilename;
+	_logDirPath = logDirPath;
+	_logfilename = logfilename;
 
 	pushQueue = &queue1;
 	popQueue = &queue2;
