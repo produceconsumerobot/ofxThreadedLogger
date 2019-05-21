@@ -21,6 +21,8 @@ LoggerThread::LoggerThread(string logDirPath, string logfilename)
 {
 	_logDirPath = logDirPath;
 	_logfilename = logfilename;
+	_tempLogDirPath = logDirPath;
+	_tempLogfilename = logfilename;
 
 	pushQueue = &queue1;
 	popQueue = &queue2;
