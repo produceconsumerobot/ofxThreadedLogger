@@ -18,7 +18,7 @@
 
 #include "ofMain.h"
 
-#define LOGGER_THREAD_DEBUG
+#define LOGGER_THREAD_DEBUG // Comment out prior to release
 
 
 class LoggerThread : public ofThread {
@@ -63,10 +63,17 @@ public:
 		PUSH,
 		POP
 	};
+
+	/*!
+		@brief Sets the queue size above which pushes are delayed to allow queue to pop
+		@return Size of specified queue
+	*/
 	size_t size(LoggerQueue lq);
 
-	// @brief Sets the queue size above which pushes are delayed to allow queue to pop
-	// @param pushThrottlingSize queue size trigger to impose a queue popping delay
+	/*!
+		@brief Returns size of PUSH or POP queue
+		@param pushThrottlingSize Queue size trigger to impose a queue popping delay
+	*/
 	void setPushThrottlingSize(size_t pushThrottlingSize = SIZE_MAX / 2);
 };
 

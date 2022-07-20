@@ -30,14 +30,17 @@ LoggerThread::LoggerThread(string logDirPath, string logfilename)
 	
 LoggerThread::~LoggerThread() {
 	// Stop the thread if it's still running
+#ifdef LOGGER_THREAD_DEBUG
 	ofLog(OF_LOG_VERBOSE, "LoggerThread::~LoggerThread()");
+#endif
 	stopThread();
 }
 
 void LoggerThread::stopThread()
 {
+#ifdef LOGGER_THREAD_DEBUG
 	ofLog(OF_LOG_VERBOSE, "LoggerThread::stopThread()");
-	//ofThread::stopThread();
+#endif
 	if (isThreadRunning()) {
 		waitForThread(true);
 	}
@@ -65,11 +68,11 @@ void LoggerThread::log(string logString) {
 	ofDirectory dir(_logDirPath);
 	dir.create(true);
 	//_mkdir( _logDirPath.c_str() );//, S_IRWXU | S_IRWXG | S_IRWXO);
-    string filename = _logDirPath + _logfilename;
-    ofstream mFile;
+  string filename = _logDirPath + _logfilename;
+  ofstream mFile;
 	mFile.open(filename.c_str(), ios::out | ios::app);
 	mFile << logString;
-    mFile.close();
+  mFile.close();
 }
 
 void LoggerThread::pop() {
@@ -100,9 +103,9 @@ void LoggerThread::push(string logString)
 		while (pushQueue->size() > 0 || popQueue->size() > 0)
 		{
 			ofSleepMillis(_loopSleep / 2);
-			#ifdef LOGGER_THREAD_DEBUG 
+#ifdef LOGGER_THREAD_DEBUG 
 			cout << "*";
-			#endif
+#endif
 		}
 	}
 
@@ -190,5 +193,7 @@ size_t LoggerThread::size(LoggerQueue lq)
 
 void LoggerThread::setPushThrottlingSize(size_t pushThrottlingSize)
 {
+	lock();
 	_pushThrottlingSize = pushThrottlingSize;
+	unlock();
 }
