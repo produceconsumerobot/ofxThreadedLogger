@@ -18,7 +18,7 @@
 
 #include "ofMain.h"
 
-#define LOGGER_THREAD_DEBUG // Comment out prior to release
+//#define LOGGER_THREAD_DEBUG // Comment out prior to release
 
 
 class LoggerThread : public ofThread {
