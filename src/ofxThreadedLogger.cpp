@@ -30,14 +30,17 @@ LoggerThread::LoggerThread(string logDirPath, string logfilename)
 	
 LoggerThread::~LoggerThread() {
 	// Stop the thread if it's still running
-	waitForThread(true);
-	swapQueues();
-	popAll();
+	ofLog(OF_LOG_VERBOSE, "LoggerThread::~LoggerThread()");
+	stopThread();
 }
 
 void LoggerThread::stopThread()
 {
-	waitForThread(true);
+	ofLog(OF_LOG_VERBOSE, "LoggerThread::stopThread()");
+	//ofThread::stopThread();
+	if (isThreadRunning()) {
+		waitForThread(true);
+	}
 	swapQueues();
 	popAll();
 }
