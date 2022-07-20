@@ -94,6 +94,18 @@ void LoggerThread::popAll()
 
 void LoggerThread::push(string logString) 
 {
+	// ToDo: There may be ways to substantially optimize the push throttling
+	if (pushQueue->size() > _pushThrottlingSize || popQueue->size() > _pushThrottlingSize)
+	{
+		while (pushQueue->size() > 0 || popQueue->size() > 0)
+		{
+			ofSleepMillis(1);
+			#ifdef LOGGER_THREAD_DEBUG 
+			cout << "*";
+			#endif
+		}
+	}
+
 	lock();
 	pushQueue->push(logString);
 	unlock();
@@ -174,4 +186,9 @@ size_t LoggerThread::size(LoggerQueue lq)
 	}
 	unlock();
 	return out;
+}
+
+void LoggerThread::setPushThrottlingSize(size_t pushThrottlingSize)
+{
+	_pushThrottlingSize = pushThrottlingSize;
 }

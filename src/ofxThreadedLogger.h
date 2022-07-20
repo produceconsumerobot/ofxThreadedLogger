@@ -18,6 +18,8 @@
 
 #include "ofMain.h"
 
+#define LOGGER_THREAD_DEBUG
+
 
 class LoggerThread : public ofThread {
 private:
@@ -33,6 +35,8 @@ private:
 
 	queue<string> * pushQueue;	// Pointer to queue that's accepting incoming data
 	queue<string> * popQueue;	// Pointer to queue that's being written
+
+	size_t _pushThrottlingSize = SIZE_MAX / 2; // queue size trigger to impose a queue popping delay
 
 	void threadedFunction();	
 	void log(string logString);
@@ -59,6 +63,10 @@ public:
 		POP
 	};
 	size_t size(LoggerQueue lq);
+
+	// @brief Sets the queue size above which pushes are delayed to allow queue to pop
+	// @param pushThrottlingSize queue size trigger to impose a queue popping delay
+	void setPushThrottlingSize(size_t pushThrottlingSize = SIZE_MAX / 2);
 };
 
 
