@@ -37,6 +37,7 @@ private:
 	queue<string> * popQueue;	// Pointer to queue that's being written
 
 	size_t _pushThrottlingSize = SIZE_MAX / 2; // queue size trigger to impose a queue popping delay
+	int _loopSleep = 4;
 
 	void threadedFunction();	
 	void log(string logString);

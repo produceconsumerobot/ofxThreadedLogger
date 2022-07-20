@@ -99,7 +99,7 @@ void LoggerThread::push(string logString)
 	{
 		while (pushQueue->size() > 0 || popQueue->size() > 0)
 		{
-			ofSleepMillis(1);
+			ofSleepMillis(_loopSleep / 2);
 			#ifdef LOGGER_THREAD_DEBUG 
 			cout << "*";
 			#endif
@@ -127,7 +127,7 @@ void LoggerThread::threadedFunction()
 		// pop queue is now safe from push thread collisions
 		popAll();
 
-		sleep(4);
+		sleep(_loopSleep);
 	}
 }
 
