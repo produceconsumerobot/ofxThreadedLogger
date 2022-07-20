@@ -156,3 +156,19 @@ string LoggerThread::fileDateTimeString(unsigned long long ofTime)
 
 	return output;
 }
+
+size_t LoggerThread::size(LoggerQueue lq)
+{
+	size_t out;
+	lock();
+	if (lq == LoggerQueue::PUSH)
+	{
+		out = pushQueue->size();
+	}
+	if (lq == LoggerQueue::POP)
+	{
+		out = popQueue->size();
+	}
+	unlock();
+	return out;
+}

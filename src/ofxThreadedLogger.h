@@ -52,6 +52,13 @@ public:
 	void setFilename(string filename);		
 	void push(string logString);
 	void stopThread();
+
+	enum LoggerQueue 
+	{
+		PUSH,
+		POP
+	};
+	size_t size(LoggerQueue lq);
 };
 
 
