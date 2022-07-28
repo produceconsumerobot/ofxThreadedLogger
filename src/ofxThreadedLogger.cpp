@@ -30,14 +30,20 @@ LoggerThread::LoggerThread(string logDirPath, string logfilename)
 	
 LoggerThread::~LoggerThread() {
 	// Stop the thread if it's still running
-	waitForThread(true);
-	swapQueues();
-	popAll();
+#ifdef LOGGER_THREAD_DEBUG
+	ofLog(OF_LOG_VERBOSE, "LoggerThread::~LoggerThread()");
+#endif
+	stopThread();
 }
 
 void LoggerThread::stopThread()
 {
-	waitForThread(true);
+#ifdef LOGGER_THREAD_DEBUG
+	ofLog(OF_LOG_VERBOSE, "LoggerThread::stopThread()");
+#endif
+	if (isThreadRunning()) {
+		waitForThread(true);
+	}
 	swapQueues();
 	popAll();
 }
@@ -62,11 +68,11 @@ void LoggerThread::log(string logString) {
 	ofDirectory dir(_logDirPath);
 	dir.create(true);
 	//_mkdir( _logDirPath.c_str() );//, S_IRWXU | S_IRWXG | S_IRWXO);
-    string filename = _logDirPath + _logfilename;
-    ofstream mFile;
+  string filename = _logDirPath + _logfilename;
+  ofstream mFile;
 	mFile.open(filename.c_str(), ios::out | ios::app);
 	mFile << logString;
-    mFile.close();
+  mFile.close();
 }
 
 void LoggerThread::pop() {
@@ -91,6 +97,18 @@ void LoggerThread::popAll()
 
 void LoggerThread::push(string logString) 
 {
+	// ToDo: There may be ways to substantially optimize the push throttling
+	if (pushQueue->size() > _pushThrottlingSize || popQueue->size() > _pushThrottlingSize)
+	{
+		while (pushQueue->size() > 0 || popQueue->size() > 0)
+		{
+			ofSleepMillis(_loopSleep / 2);
+#ifdef LOGGER_THREAD_DEBUG 
+			cout << "*";
+#endif
+		}
+	}
+
 	lock();
 	pushQueue->push(logString);
 	unlock();
@@ -112,7 +130,7 @@ void LoggerThread::threadedFunction()
 		// pop queue is now safe from push thread collisions
 		popAll();
 
-		sleep(4);
+		sleep(_loopSleep);
 	}
 }
 
@@ -155,4 +173,27 @@ string LoggerThread::fileDateTimeString(unsigned long long ofTime)
 	output = output + ofToString(ofTime - (ofTime / 1000));
 
 	return output;
+}
+
+size_t LoggerThread::size(LoggerQueue lq)
+{
+	size_t out;
+	lock();
+	if (lq == LoggerQueue::PUSH)
+	{
+		out = pushQueue->size();
+	}
+	if (lq == LoggerQueue::POP)
+	{
+		out = popQueue->size();
+	}
+	unlock();
+	return out;
+}
+
+void LoggerThread::setPushThrottlingSize(size_t pushThrottlingSize)
+{
+	lock();
+	_pushThrottlingSize = pushThrottlingSize;
+	unlock();
 }

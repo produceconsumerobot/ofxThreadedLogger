@@ -18,6 +18,8 @@
 
 #include "ofMain.h"
 
+//#define LOGGER_THREAD_DEBUG // Comment out prior to release
+
 
 class LoggerThread : public ofThread {
 private:
@@ -33,6 +35,9 @@ private:
 
 	queue<string> * pushQueue;	// Pointer to queue that's accepting incoming data
 	queue<string> * popQueue;	// Pointer to queue that's being written
+
+	size_t _pushThrottlingSize = SIZE_MAX / 2; // queue size trigger to impose a queue popping delay
+	int _loopSleep = 4;
 
 	void threadedFunction();	
 	void log(string logString);
@@ -52,6 +57,24 @@ public:
 	void setFilename(string filename);		
 	void push(string logString);
 	void stopThread();
+
+	enum LoggerQueue 
+	{
+		PUSH,
+		POP
+	};
+
+	/*!
+		@brief Sets the queue size above which pushes are delayed to allow queue to pop
+		@return Size of specified queue
+	*/
+	size_t size(LoggerQueue lq);
+
+	/*!
+		@brief Returns size of PUSH or POP queue
+		@param pushThrottlingSize Queue size trigger to impose a queue popping delay
+	*/
+	void setPushThrottlingSize(size_t pushThrottlingSize = SIZE_MAX / 2);
 };
 
 
