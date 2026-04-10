@@ -69,8 +69,8 @@ void LoggerThread::log(string logString) {
 	dir.create(true);
 	//_mkdir( _logDirPath.c_str() );//, S_IRWXU | S_IRWXG | S_IRWXO);
   string filename = _logDirPath + _logfilename;
-  ofstream mFile;
-	mFile.open(filename.c_str(), ios::out | ios::app);
+  std::ofstream mFile;
+	mFile.open(filename.c_str(), std::ios::out | std::ios::app);
 	mFile << logString;
   mFile.close();
 }
