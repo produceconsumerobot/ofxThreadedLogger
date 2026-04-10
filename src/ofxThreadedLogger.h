@@ -30,11 +30,11 @@ private:
 	string _tempLogDirPath;		// Temporary path to avoid collisions if path changes
 	string _tempLogfilename;	// Temporary name to avoid collisions if filename changes
 	
-	queue<string> queue1;		// Multiple queues to reduce logging delays
-	queue<string> queue2;		// Multiple queues to reduce logging delays
+	std::queue<string> queue1;		// Multiple queues to reduce logging delays
+	std::queue<string> queue2;		// Multiple queues to reduce logging delays
 
-	queue<string> * pushQueue;	// Pointer to queue that's accepting incoming data
-	queue<string> * popQueue;	// Pointer to queue that's being written
+	std::queue<string> * pushQueue;	// Pointer to queue that's accepting incoming data
+	std::queue<string> * popQueue;	// Pointer to queue that's being written
 
 	size_t _pushThrottlingSize = SIZE_MAX / 2; // queue size trigger to impose a queue popping delay
 	int _loopSleep = 4;
